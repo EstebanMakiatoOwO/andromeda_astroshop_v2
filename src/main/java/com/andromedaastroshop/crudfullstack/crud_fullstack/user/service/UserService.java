@@ -7,7 +7,6 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.Role;
 import java.util.List;
 
 public interface UserService {
-    UserRespose register(RegisterRequest request);
 
     UserRespose findById(Long id);
 

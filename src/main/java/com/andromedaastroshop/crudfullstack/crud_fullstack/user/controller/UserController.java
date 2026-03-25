@@ -1,6 +1,5 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.user.controller;
 
-import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.RegisterRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UserRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.Role;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.UserService;
@@ -16,11 +15,6 @@ public class UserController {
     }
 
     private final UserService userService;
-
-    @PostMapping
-    public UserRespose register(@RequestBody RegisterRequest request) {
-        return userService.register(request);
-    }
 
     @GetMapping("/{id}")
     public UserRespose getUser(@PathVariable Long id){
