@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.user.service;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UpdateUserRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UserRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.Role;
 
@@ -16,4 +17,8 @@ public interface UserService {
     List<UserRespose> findAllByRole(Role role);
 
     List<UserRespose> findAllUsers();
+
+    UserRespose updateById(Long id, UpdateUserRequest request);
+
+    String deleteByID(Long id);
 }
