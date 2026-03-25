@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String deleteByID(Long id) {
+    public String deleteById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found: " + id));
 
@@ -88,5 +88,4 @@ public class UserServiceImpl implements UserService {
                 user.getRole()
         );
     }
-
 }
