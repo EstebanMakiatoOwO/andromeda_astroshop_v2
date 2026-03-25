@@ -10,6 +10,9 @@ public class OpenApiConfig {
 
     @Bean
     OpenAPI api() {
-        return new OpenAPI().info(new Info().title("Andromeda AstroShop Ecommerce API").version("1.0").description("Ecommerce para venta de telescopios, tickets, etc."));
+        return new OpenAPI().info(new Info()
+                .title("Andromeda AstroShop Ecommerce API")
+                .version("1.0")
+                .description("Ecommerce para venta de telescopios, tickets, etc."));
     }
 }
