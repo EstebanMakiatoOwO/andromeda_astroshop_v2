@@ -35,4 +35,9 @@ public class UserController {
     public List<UserRespose> getAllUsersByRole(@PathVariable Role role) {
         return userService.findAllByRole(role);
     }
+
+    @GetMapping
+    public  List<UserRespose> getAllUsers() {
+        return userService.findAllUsers();
+    }
 }

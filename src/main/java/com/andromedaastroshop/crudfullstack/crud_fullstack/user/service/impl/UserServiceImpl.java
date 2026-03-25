@@ -47,6 +47,11 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<UserRespose> findAllUsers() {
+        return userRepository.findAll().stream().map(this::mapToUserRespose).toList();
+    }
+
     private UserRespose mapToUserRespose(User user) {
         return new UserRespose(
                 user.getId(),
