@@ -1,4 +1,4 @@
-package user.service.impl;
+package com.andromedaastroshop.crudfullstack.crud_fullstack.user.impl;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.LoginRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.RegisterRequest;

@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.impl;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceAlreadyExistsException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.JwtRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.LoginRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.RegisterRequest;
@@ -33,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserRespose register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already registered");
+            throw new ResourceAlreadyExistsException("Email already registered: " + request.email());
         }
 
         User user = new User();

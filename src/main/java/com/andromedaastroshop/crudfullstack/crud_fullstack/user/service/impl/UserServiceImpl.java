@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.impl;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UpdateUserRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UserRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.Role;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRespose findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
         return mapToUserRespose(user);
     }
 
