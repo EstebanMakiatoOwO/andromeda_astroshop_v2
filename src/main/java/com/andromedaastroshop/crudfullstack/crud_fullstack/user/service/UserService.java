@@ -20,5 +20,5 @@ public interface UserService {
 
     UserRespose updateById(Long id, UpdateUserRequest request);
 
-    String deleteByID(Long id);
+    String deleteById(Long id);
 }
