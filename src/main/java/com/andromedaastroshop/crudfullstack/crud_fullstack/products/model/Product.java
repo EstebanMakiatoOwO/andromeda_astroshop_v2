@@ -1,10 +1,7 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.products.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -36,7 +33,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = false, nullable = false, length = 32)
+    @Column(nullable = true, length = 32)
     private String sku;
 
     @CreatedDate
@@ -63,10 +60,10 @@ public class Product {
 
     @NotNull
     @Column(nullable = false)
+    @DecimalMin(value = "100.00")
+    @Digits(integer = 8, fraction = 2)
     private BigDecimal price;
 
-    @Lob
-    @Column(nullable = false)
     private String imgUrl;
 
     public Long getId() {
