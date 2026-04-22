@@ -11,11 +11,15 @@ public interface ProductService {
 
     ProductResponse create(CreateProductRequest request, MultipartFile image);
 
-    ProductResponse findByid(Long id);
+    ProductResponse findById(Long id);
+
+    ProductResponse findBySku(String sku);
+
+    List<ProductResponse> findByName(String name);
 
     List<ProductResponse> findAllProducts();
 
-    ProductResponse updateById(Long id, UpdateProductRequest request);
+    ProductResponse updateById(Long id, UpdateProductRequest request, MultipartFile image);
 
     String deleteById(Long id);
 }

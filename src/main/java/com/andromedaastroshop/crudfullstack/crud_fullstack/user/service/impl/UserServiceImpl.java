@@ -34,14 +34,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRespose findByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         return mapToUserRespose(user);
     }
 
     @Override
     public UserRespose findByIdAndRole(Long id, Role role) {
         User user = userRepository.findByIdAndRole(id, role)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id + " and role " + role));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id + " and role " + role));
         return mapToUserRespose(user);
     }
 
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserRespose updateById(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
 
         user.setName(request.name());
         user.setEmail(request.email());
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String deleteById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
 
         userRepository.delete(user);
         return "User deleted successfully";

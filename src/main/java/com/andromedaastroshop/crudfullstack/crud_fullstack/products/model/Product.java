@@ -33,7 +33,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = true, length = 32)
+    @Size(max = 32)
+    @Column(unique = true, length = 32) // El SKU DEBE ser único en la base de datos
     private String sku;
 
     @CreatedDate

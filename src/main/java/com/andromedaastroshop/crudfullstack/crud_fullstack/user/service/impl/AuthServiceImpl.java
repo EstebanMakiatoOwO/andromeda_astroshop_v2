@@ -1,6 +1,7 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.impl;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceAlreadyExistsException;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.JwtRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.LoginRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.RegisterRequest;
@@ -56,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
         );
         // Si la autenticación es exitosa, buscamos el usuario para generar el token
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("User not found after authentication")); // Esto no debería pasar
+                .orElseThrow(() -> new ResourceNotFoundException("User not found after authentication")); 
         return new JwtRespose(user.getName(), jwtService.generateToken(user.getEmail()));
     }
 
