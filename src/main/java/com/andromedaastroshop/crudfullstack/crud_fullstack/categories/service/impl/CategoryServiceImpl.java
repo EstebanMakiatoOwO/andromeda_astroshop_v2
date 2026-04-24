@@ -5,6 +5,8 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.dto.Create
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.model.Category;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.repository.CategoryRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.service.CategoryService;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceAlreadyExistsException;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,40 +22,67 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse create(CreateCategoryRequest request) {
+        if (categoryRepository.existsByName(request.name())) {
+            throw new ResourceAlreadyExistsException("Category with name '" + request.name() + "' already exists");
+        }
+        if (request.slug() != null && categoryRepository.existsBySlug(request.slug())) {
+            throw new ResourceAlreadyExistsException("Category with slug '" + request.slug() + "' already exists");
+        }
+
         Category category = new Category();
+        category.setName(request.name());
+        category.setDescription(request.description());
+        category.setSlug(request.slug());
+
+        return mapToCategoryResponse(categoryRepository.save(category));
+    }
+
+    @Override
+    public CategoryResponse findById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        return mapToCategoryResponse(category);
+    }
+
+    @Override
+    public CategoryResponse findBySlug(String slug) {
+        return categoryRepository.findBySlug(slug)
+                .map(this::mapToCategoryResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with slug: " + slug));
+    }
+
+    @Override
+    public List<CategoryResponse> findAllCategories() {
+        return categoryRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(this::mapToCategoryResponse)
+                .toList();
+    }
+
+    @Override
+    public CategoryResponse updateById(Long id, CreateCategoryRequest request) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+
+        if (!category.getName().equals(request.name()) && categoryRepository.existsByName(request.name())) {
+            throw new ResourceAlreadyExistsException("Category with name '" + request.name() + "' already exists");
+        }
+        if (request.slug() != null && !request.slug().equals(category.getSlug()) && categoryRepository.existsBySlug(request.slug())) {
+            throw new ResourceAlreadyExistsException("Category with slug '" + request.slug() + "' already exists");
+        }
 
         category.setName(request.name());
         category.setDescription(request.description());
         category.setSlug(request.slug());
 
-        Category createdCategory = categoryRepository.save(category);
-
-        return mapToCategoryResponse(createdCategory);
-    }
-
-    @Override
-    public CategoryResponse findById(Long id) {
-        return null;
-    }
-
-    @Override
-    public CategoryResponse findBySlug(String slug) {
-        return null;
-    }
-
-    @Override
-    public List<CategoryResponse> findAllCategories() {
-        return List.of();
-    }
-
-    @Override
-    public CategoryResponse updateById(Long id, CreateCategoryRequest request) {
-        return null;
+        return mapToCategoryResponse(categoryRepository.save(category));
     }
 
     @Override
     public String deleteById(Long id) {
-        return "";
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        categoryRepository.delete(category);
+        return "Category deleted successfully";
     }
 
     private CategoryResponse mapToCategoryResponse(Category category) {
