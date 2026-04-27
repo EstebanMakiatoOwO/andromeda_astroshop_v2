@@ -22,6 +22,11 @@ public record CreateStockMovementRequest(
 
         String reason,
 
+        Long referenceId,
+
+        @Size(max = 50)
+        String referenceType,
+
         @Size(max = 500, message = "Las notas no pueden tener más de 500 caracteres")
         String notes
 ) {}

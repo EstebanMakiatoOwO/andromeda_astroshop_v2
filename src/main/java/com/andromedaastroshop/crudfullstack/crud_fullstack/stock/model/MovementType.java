@@ -4,5 +4,6 @@ public enum MovementType {
     RESTOCK,
     SALE,
     RETURN,
-    ADJUSTMENT
+    ADJUSTMENT_IN,
+    ADJUSTMENT_OUT
 }

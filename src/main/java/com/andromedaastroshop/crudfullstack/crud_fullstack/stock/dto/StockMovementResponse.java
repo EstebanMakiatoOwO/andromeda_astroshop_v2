@@ -17,6 +17,8 @@ public record StockMovementResponse(
         BigDecimal unitCost,
         Integer stockBefore,
         Integer stockAfter,
+        Long referenceId,
+        String referenceType,
         String notes,
         LocalDateTime createdAt
 ) {}

@@ -53,6 +53,11 @@ public class StockMovement {
     @Column(nullable = false)
     private Integer stockAfter;
 
+    private Long referenceId;
+
+    @Column(length = 50)
+    private String referenceType;
+
     @Column(length = 500)
     private String notes;
 
@@ -86,6 +91,12 @@ public class StockMovement {
 
     public Integer getStockAfter() { return stockAfter; }
     public void setStockAfter(Integer stockAfter) { this.stockAfter = stockAfter; }
+
+    public Long getReferenceId() { return referenceId; }
+    public void setReferenceId(Long referenceId) { this.referenceId = referenceId; }
+
+    public String getReferenceType() { return referenceType; }
+    public void setReferenceType(String referenceType) { this.referenceType = referenceType; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
