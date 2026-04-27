@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.user.controller;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UpdateUserRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UserRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.Role;
@@ -75,7 +76,7 @@ public class UserControllerTest {
 
     @Test
     void getUser_deberiaRetornar404SiNoExiste() throws Exception {
-        when(userService.findById(99L)).thenThrow(new RuntimeException("User not found"));
+        when(userService.findById(99L)).thenThrow(new ResourceNotFoundException("User not found"));
 
         mockMvc.perform(get("/api/v1/users/99")).andExpect(status().isNotFound());
     }

@@ -6,6 +6,8 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.RegisterRequ
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UserRespose;
 
 public interface AuthService {
+
     UserRespose register(RegisterRequest request);
+
     JwtRespose login(LoginRequest request);
 }
