@@ -17,4 +17,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllByOrderByCreatedAtDesc();
 
     boolean existsBySku(String sku);
+
+    List<Product> findByCategoriesId(Long categoryId);
 }

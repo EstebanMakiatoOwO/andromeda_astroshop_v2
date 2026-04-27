@@ -84,4 +84,11 @@ public class ProductController {
                 ApiResponse.success("Producto eliminado correctamente", null)
         );
     }
+
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> findByCategory(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Productos encontrados", productService.findByCategory(categoryId))
+        );
+    }
 }

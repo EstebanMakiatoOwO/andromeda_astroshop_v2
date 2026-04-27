@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.products.model;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.model.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -66,6 +69,14 @@ public class Product {
     private BigDecimal price;
 
     private String imgUrl;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "product_categories",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -145,5 +156,13 @@ public class Product {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 }

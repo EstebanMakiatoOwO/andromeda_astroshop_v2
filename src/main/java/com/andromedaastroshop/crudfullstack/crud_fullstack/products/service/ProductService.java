@@ -22,4 +22,6 @@ public interface ProductService {
     ProductResponse updateById(Long id, UpdateProductRequest request, MultipartFile image);
 
     String deleteById(Long id);
+
+    List<ProductResponse> findByCategory(Long categoryId);
 }

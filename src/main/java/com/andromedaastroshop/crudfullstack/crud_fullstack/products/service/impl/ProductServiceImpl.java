@@ -1,5 +1,8 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.products.service.impl;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.dto.CategoryResponse;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.model.Category;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.repository.CategoryRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceAlreadyExistsException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto.CreateProductRequest;
@@ -12,16 +15,20 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.products.storage.Stor
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     private final StorageService storageService;
 
-    public ProductServiceImpl(ProductRepository productRepository, StorageService storageService) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, StorageService storageService) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
         this.storageService = storageService;
     }
 
@@ -39,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(request.stock());
         product.setPrice(request.price());
         product.setSku(request.sku());
+        product.setCategories(resolveCategories(request.categoryIds()));
 
         if (image != null && !image.isEmpty()) {
             String url = storageService.upload(image);
@@ -96,6 +104,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(request.stock());
         product.setShortDescription(request.shortDescription());
         product.setLongDescription(request.longDescription());
+        product.setCategories(resolveCategories(request.categoryIds()));
 
         if (image != null && !image.isEmpty()) {
             String url = storageService.upload(image);
@@ -115,7 +124,23 @@ public class ProductServiceImpl implements ProductService {
         return "Product deleted successfully";
     }
 
+    @Override
+    public List<ProductResponse> findByCategory(Long categoryId) {
+        return productRepository.findByCategoriesId(categoryId).stream()
+                .map(this::mapToProductResponse)
+                .toList();
+    }
+
+    private Set<Category> resolveCategories(List<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) return new HashSet<>();
+        return new HashSet<>(categoryRepository.findAllById(categoryIds));
+    }
+
     private ProductResponse mapToProductResponse(Product product) {
+        List<CategoryResponse> categories = product.getCategories().stream()
+                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getDescription(), c.getSlug(), c.getCreatedAt(), c.getUpdatedAt()))
+                .toList();
+
         return new ProductResponse(
                 product.getId(),
                 product.getSku(),
@@ -126,7 +151,8 @@ public class ProductServiceImpl implements ProductService {
                 product.getLongDescription(),
                 product.getStock(),
                 product.getPrice(),
-                product.getImgUrl()
+                product.getImgUrl(),
+                categories
         );
     }
 }
