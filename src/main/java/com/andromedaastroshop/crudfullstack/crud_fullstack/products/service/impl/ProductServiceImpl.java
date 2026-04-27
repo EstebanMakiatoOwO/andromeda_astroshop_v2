@@ -36,16 +36,25 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse create(CreateProductRequest request, MultipartFile image) {
         String sku = (request.sku() != null) ? request.sku().trim() : null;
         if (sku != null && !sku.isEmpty() && productRepository.existsBySku(sku)) {
-            throw new ResourceAlreadyExistsException("Product with SKU " + request.sku() + " already exists");
+            throw new ResourceAlreadyExistsException("Product with SKU " + sku + " already exists");
+        }
+
+        String barcode = (request.barcode() != null) ? request.barcode().trim() : null;
+        if (barcode != null && !barcode.isEmpty() && productRepository.existsByBarcode(barcode)) {
+            throw new ResourceAlreadyExistsException("Product with barcode " + barcode + " already exists");
         }
 
         Product product = new Product();
+        product.setSku(request.sku());
+        product.setBarcode(request.barcode());
         product.setName(request.name());
         product.setShortDescription(request.shortDescription());
         product.setLongDescription(request.longDescription());
         product.setStock(request.stock());
+        product.setStockAlertThreshold(request.stockAlertThreshold());
+        product.setCostPrice(request.costPrice());
         product.setPrice(request.price());
-        product.setSku(request.sku());
+        product.setIsActive(request.isActive());
         product.setCategories(resolveCategories(request.categoryIds()));
 
         if (image != null && !image.isEmpty()) {
@@ -91,7 +100,6 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
         String newSku = (request.sku() != null) ? request.sku().trim() : null;
-
         if (newSku != null && !newSku.equals(product.getSku())) {
             if (productRepository.existsBySku(newSku)) {
                 throw new ResourceAlreadyExistsException("Product with SKU " + newSku + " already exists");
@@ -99,11 +107,23 @@ public class ProductServiceImpl implements ProductService {
             product.setSku(newSku);
         }
 
+        String newBarcode = (request.barcode() != null) ? request.barcode().trim() : null;
+        if (newBarcode != null && !newBarcode.equals(product.getBarcode())) {
+            if (productRepository.existsByBarcode(newBarcode)) {
+                throw new ResourceAlreadyExistsException("Product with barcode " + newBarcode + " already exists");
+            }
+            product.setBarcode(newBarcode);
+        }
+
+        product.setBarcode(request.barcode());
         product.setName(request.name());
-        product.setPrice(request.price());
-        product.setStock(request.stock());
         product.setShortDescription(request.shortDescription());
         product.setLongDescription(request.longDescription());
+        product.setStock(request.stock());
+        product.setStockAlertThreshold(request.stockAlertThreshold());
+        product.setCostPrice(request.costPrice());
+        product.setPrice(request.price());
+        product.setIsActive(request.isActive());
         product.setCategories(resolveCategories(request.categoryIds()));
 
         if (image != null && !image.isEmpty()) {
@@ -144,14 +164,18 @@ public class ProductServiceImpl implements ProductService {
         return new ProductResponse(
                 product.getId(),
                 product.getSku(),
+                product.getBarcode(),
                 product.getCreatedAt(),
                 product.getUpdatedAt(),
                 product.getName(),
                 product.getShortDescription(),
                 product.getLongDescription(),
                 product.getStock(),
+                product.getStockAlertThreshold(),
+                product.getCostPrice(),
                 product.getPrice(),
                 product.getImgUrl(),
+                product.getIsActive(),
                 categories
         );
     }

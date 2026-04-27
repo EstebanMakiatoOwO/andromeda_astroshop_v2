@@ -37,8 +37,12 @@ public class Product {
     private Long id;
 
     @Size(max = 32)
-    @Column(unique = true, length = 32) // El SKU DEBE ser único en la base de datos
+    @Column(unique = true, length = 32)
     private String sku;
+
+    @Size(max = 50)
+    @Column(unique = true, length = 50)
+    private String barcode;
 
     @CreatedDate
     @Column(updatable = false)
@@ -62,6 +66,14 @@ public class Product {
     @Min(0)
     private Integer stock;
 
+    @Min(0)
+    private Integer stockAlertThreshold;
+
+    @Column(precision = 10, scale = 2)
+    @DecimalMin(value = "0.00")
+    @Digits(integer = 8, fraction = 2)
+    private BigDecimal costPrice;
+
     @NotNull
     @Column(nullable = false)
     @DecimalMin(value = "100.00")
@@ -69,6 +81,9 @@ public class Product {
     private BigDecimal price;
 
     private String imgUrl;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -110,6 +125,14 @@ public class Product {
         this.sku = sku;
     }
 
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
     public String getName() {
         return name;
     }
@@ -142,6 +165,22 @@ public class Product {
         this.stock = stock;
     }
 
+    public Integer getStockAlertThreshold() {
+        return stockAlertThreshold;
+    }
+
+    public void setStockAlertThreshold(Integer stockAlertThreshold) {
+        this.stockAlertThreshold = stockAlertThreshold;
+    }
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -156,6 +195,14 @@ public class Product {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     public Set<Category> getCategories() {
