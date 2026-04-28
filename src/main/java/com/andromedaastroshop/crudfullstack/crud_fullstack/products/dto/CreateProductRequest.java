@@ -37,5 +37,7 @@ public record CreateProductRequest(
     @NotNull(message = "El estado del producto es obligatorio")
     Boolean isActive,
 
+    Boolean isCatalog,
+
     List<Long> categoryIds
 ) {}

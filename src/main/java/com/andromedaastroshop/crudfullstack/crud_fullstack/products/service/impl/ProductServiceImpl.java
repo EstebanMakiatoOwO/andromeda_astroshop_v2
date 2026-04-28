@@ -50,11 +50,12 @@ public class ProductServiceImpl implements ProductService {
         product.setName(request.name());
         product.setShortDescription(request.shortDescription());
         product.setLongDescription(request.longDescription());
-        product.setStock(request.stock());
+        product.setStock(request.stock() != null ? request.stock() : 0);
         product.setStockAlertThreshold(request.stockAlertThreshold());
         product.setCostPrice(request.costPrice());
         product.setPrice(request.price());
         product.setIsActive(request.isActive());
+        product.setIsCatalog(Boolean.TRUE.equals(request.isCatalog()));
         product.setCategories(resolveCategories(request.categoryIds()));
 
         if (image != null && !image.isEmpty()) {
@@ -119,11 +120,12 @@ public class ProductServiceImpl implements ProductService {
         product.setName(request.name());
         product.setShortDescription(request.shortDescription());
         product.setLongDescription(request.longDescription());
-        product.setStock(request.stock());
+        product.setStock(request.stock() != null ? request.stock() : 0);
         product.setStockAlertThreshold(request.stockAlertThreshold());
         product.setCostPrice(request.costPrice());
         product.setPrice(request.price());
         product.setIsActive(request.isActive());
+        product.setIsCatalog(Boolean.TRUE.equals(request.isCatalog()));
         product.setCategories(resolveCategories(request.categoryIds()));
 
         if (image != null && !image.isEmpty()) {
@@ -183,6 +185,7 @@ public class ProductServiceImpl implements ProductService {
                 product.getPrice(),
                 product.getImgUrl(),
                 product.getIsActive(),
+                product.getIsCatalog(),
                 categories
         );
     }

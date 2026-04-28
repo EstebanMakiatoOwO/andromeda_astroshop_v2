@@ -21,6 +21,7 @@ public record ProductResponse(
         BigDecimal price,
         String imgUrl,
         Boolean isActive,
+        Boolean isCatalog,
         List<CategoryResponse> categories
 ) {
 }

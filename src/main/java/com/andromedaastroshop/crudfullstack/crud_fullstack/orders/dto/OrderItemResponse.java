@@ -8,5 +8,6 @@ public record OrderItemResponse(
         String productName,
         Integer quantity,
         BigDecimal unitPrice,
-        BigDecimal subtotal
+        BigDecimal subtotal,
+        Boolean isCatalog
 ) {}

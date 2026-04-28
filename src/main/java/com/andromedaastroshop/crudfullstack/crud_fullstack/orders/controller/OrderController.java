@@ -10,7 +10,7 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,9 +28,12 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<ApiResponse<OrderResponse>> create(
             @Valid @RequestBody CreateOrderRequest request,
-            @AuthenticationPrincipal(required = false) User user
+            Authentication authentication
     ) {
-        Long userId = user != null ? user.getId() : null;
+        Long userId = null;
+        if (authentication != null && authentication.getPrincipal() instanceof User user) {
+            userId = user.getId();
+        }
         OrderResponse response = orderService.create(request, userId);
         return ResponseEntity.ok(ApiResponse.success("Orden creada correctamente", response));
     }
@@ -41,15 +44,17 @@ public class OrderController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<OrderResponse>>> findMyOrders(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> findMyOrders(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(ApiResponse.success("Órdenes encontradas", orderService.findByUserId(user.getId())));
     }
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<OrderResponse>> cancel(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            Authentication authentication
     ) {
+        User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(ApiResponse.success("Orden cancelada", orderService.cancel(id, user.getId())));
     }
 

@@ -32,6 +32,9 @@ public class OrderItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
+    @Column(nullable = false)
+    private Boolean isCatalog = false;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -49,4 +52,7 @@ public class OrderItem {
 
     public BigDecimal getSubtotal() { return subtotal; }
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+
+    public Boolean getIsCatalog() { return isCatalog; }
+    public void setIsCatalog(Boolean isCatalog) { this.isCatalog = isCatalog; }
 }

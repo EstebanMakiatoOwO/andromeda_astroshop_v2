@@ -85,6 +85,9 @@ public class Product {
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Column(nullable = false)
+    private Boolean isCatalog = false;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "product_categories",
@@ -203,6 +206,14 @@ public class Product {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public Boolean getIsCatalog() {
+        return isCatalog;
+    }
+
+    public void setIsCatalog(Boolean isCatalog) {
+        this.isCatalog = isCatalog;
     }
 
     public Set<Category> getCategories() {

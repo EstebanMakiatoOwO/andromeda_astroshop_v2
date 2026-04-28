@@ -55,17 +55,24 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal subtotal = BigDecimal.ZERO;
 
         for (var itemRequest : request.items()) {
-            Product product = productRepository.findById(itemRequest.productId())
+            Product product = productRepository.findByIdForUpdate(itemRequest.productId())
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado: " + itemRequest.productId()));
 
             if (!product.getIsActive()) {
                 throw new ResourceNotFoundException("Producto no disponible: " + product.getName());
             }
 
-            if (product.getStock() < itemRequest.quantity()) {
+            boolean isCatalog = Boolean.TRUE.equals(product.getIsCatalog());
+
+            if (!isCatalog && product.getStock() < itemRequest.quantity()) {
                 throw new InsufficientStockException(
                         "Stock insuficiente para \"" + product.getName() + "\". Disponible: " + product.getStock()
                 );
+            }
+
+            if (!isCatalog) {
+                product.setStock(product.getStock() - itemRequest.quantity());
+                productRepository.save(product);
             }
 
             BigDecimal unitPrice = product.getPrice();
@@ -77,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
             item.setQuantity(itemRequest.quantity());
             item.setUnitPrice(unitPrice);
             item.setSubtotal(itemSubtotal);
+            item.setIsCatalog(isCatalog);
 
             items.add(item);
             subtotal = subtotal.add(itemSubtotal);
@@ -144,6 +152,14 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderNotModifiableException("Solo se pueden cancelar órdenes en estado PENDING");
         }
 
+        order.getItems().forEach(item -> {
+            if (!Boolean.TRUE.equals(item.getIsCatalog())) {
+                Product product = item.getProduct();
+                product.setStock(product.getStock() + item.getQuantity());
+                productRepository.save(product);
+            }
+        });
+
         order.setStatus(OrderStatus.CANCELLED);
         return mapToOrderResponse(orderRepository.save(order));
     }
@@ -158,15 +174,6 @@ public class OrderServiceImpl implements OrderService {
             throw new PaymentAlreadyProcessedException("El pago ya fue procesado para la orden: " + order.getId());
         }
 
-        order.getItems().forEach(item -> {
-            Product product = item.getProduct();
-            int newStock = product.getStock() - item.getQuantity();
-            if (newStock < 0) {
-                throw new InsufficientStockException("Stock insuficiente al confirmar pago para: " + product.getName());
-            }
-            product.setStock(newStock);
-        });
-
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
     }
@@ -179,7 +186,8 @@ public class OrderServiceImpl implements OrderService {
                         item.getProduct().getName(),
                         item.getQuantity(),
                         item.getUnitPrice(),
-                        item.getSubtotal()
+                        item.getSubtotal(),
+                        item.getIsCatalog()
                 ))
                 .toList();
 
