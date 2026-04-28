@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal subtotal = BigDecimal.ZERO;
 
         for (var itemRequest : request.items()) {
-            Product product = productRepository.findByIdForUpdate(itemRequest.productId())
+            Product product = productRepository.findById(itemRequest.productId())
                     .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado: " + itemRequest.productId()));
 
             if (!product.getIsActive()) {
@@ -64,15 +64,21 @@ public class OrderServiceImpl implements OrderService {
 
             boolean isCatalog = Boolean.TRUE.equals(product.getIsCatalog());
 
-            if (!isCatalog && product.getStock() < itemRequest.quantity()) {
-                throw new InsufficientStockException(
-                        "Stock insuficiente para \"" + product.getName() + "\". Disponible: " + product.getStock()
-                );
-            }
-
             if (!isCatalog) {
-                product.setStock(product.getStock() - itemRequest.quantity());
-                productRepository.save(product);
+                try {
+                    int updated = productRepository.decrementStock(product.getId(), itemRequest.quantity());
+                    if (updated == 0) {
+                        throw new InsufficientStockException(
+                                "Stock insuficiente para \"" + product.getName() + "\". Disponible: " + product.getStock()
+                        );
+                    }
+                } catch (InsufficientStockException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new InsufficientStockException(
+                            "Stock insuficiente para \"" + product.getName() + "\". Intentá de nuevo."
+                    );
+                }
             }
 
             BigDecimal unitPrice = product.getPrice();
@@ -154,9 +160,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.getItems().forEach(item -> {
             if (!Boolean.TRUE.equals(item.getIsCatalog())) {
-                Product product = item.getProduct();
-                product.setStock(product.getStock() + item.getQuantity());
-                productRepository.save(product);
+                productRepository.incrementStock(item.getProduct().getId(), item.getQuantity());
             }
         });
 
