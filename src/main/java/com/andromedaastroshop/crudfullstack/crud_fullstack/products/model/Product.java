@@ -9,7 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -19,7 +21,7 @@ public class Product {
 
     public Product() {}
 
-    public Product(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String sku, String name, String shortDescription, String longDescription, Integer stock, BigDecimal price, String imgUrl) {
+    public Product(Long id, LocalDateTime createdAt, LocalDateTime updatedAt, String sku, String name, String shortDescription, String longDescription, Integer stock, BigDecimal price) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -29,7 +31,6 @@ public class Product {
         this.longDescription = longDescription;
         this.stock = stock;
         this.price = price;
-        this.imgUrl = imgUrl;
     }
 
     @Id
@@ -80,8 +81,6 @@ public class Product {
     @Digits(integer = 8, fraction = 2)
     private BigDecimal price;
 
-    private String imgUrl;
-
     @Column(nullable = false)
     private Boolean isActive = true;
 
@@ -95,6 +94,10 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("sortOrder ASC")
+    private List<ProductImage> images = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -192,14 +195,6 @@ public class Product {
         this.price = price;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
     public Boolean getIsActive() {
         return isActive;
     }
@@ -222,5 +217,13 @@ public class Product {
 
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
+    }
+
+    public List<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
     }
 }

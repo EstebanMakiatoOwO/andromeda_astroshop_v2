@@ -19,9 +19,9 @@ public record ProductResponse(
         Integer stockAlertThreshold,
         BigDecimal costPrice,
         BigDecimal price,
-        String imgUrl,
         Boolean isActive,
         Boolean isCatalog,
+        List<String> images,
         List<CategoryResponse> categories
 ) {
 }

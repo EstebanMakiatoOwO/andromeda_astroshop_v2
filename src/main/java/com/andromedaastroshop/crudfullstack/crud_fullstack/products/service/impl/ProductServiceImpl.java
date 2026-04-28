@@ -9,6 +9,8 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto.CreatePr
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto.ProductResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto.UpdateProductRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.model.Product;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.products.model.ProductImage;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.products.repository.ProductImageRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.repository.ProductRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.service.ProductService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.storage.StorageService;
@@ -23,11 +25,16 @@ import java.util.Set;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
     private final StorageService storageService;
 
-    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository, StorageService storageService) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ProductImageRepository productImageRepository,
+                              CategoryRepository categoryRepository,
+                              StorageService storageService) {
         this.productRepository = productRepository;
+        this.productImageRepository = productImageRepository;
         this.categoryRepository = categoryRepository;
         this.storageService = storageService;
     }
@@ -58,14 +65,17 @@ public class ProductServiceImpl implements ProductService {
         product.setIsCatalog(Boolean.TRUE.equals(request.isCatalog()));
         product.setCategories(resolveCategories(request.categoryIds()));
 
+        Product savedProduct = productRepository.save(product);
+
         if (image != null && !image.isEmpty()) {
             String url = storageService.upload(image);
-            product.setImgUrl(url);
+            ProductImage productImage = new ProductImage();
+            productImage.setProduct(savedProduct);
+            productImage.setUrl(url);
+            productImageRepository.save(productImage);
         }
 
-        Product createProduct = productRepository.save(product);
-
-        return mapToProductResponse(createProduct);
+        return mapToProductResponse(productRepository.findById(savedProduct.getId()).orElseThrow());
     }
 
     @Override
@@ -128,13 +138,17 @@ public class ProductServiceImpl implements ProductService {
         product.setIsCatalog(Boolean.TRUE.equals(request.isCatalog()));
         product.setCategories(resolveCategories(request.categoryIds()));
 
+        Product updatedProduct = productRepository.save(product);
+
         if (image != null && !image.isEmpty()) {
             String url = storageService.upload(image);
-            product.setImgUrl(url);
+            ProductImage productImage = new ProductImage();
+            productImage.setProduct(updatedProduct);
+            productImage.setUrl(url);
+            productImageRepository.save(productImage);
         }
 
-        Product updatedProduct = productRepository.save(product);
-        return mapToProductResponse(updatedProduct);
+        return mapToProductResponse(productRepository.findById(updatedProduct.getId()).orElseThrow());
     }
 
     @Override
@@ -170,6 +184,10 @@ public class ProductServiceImpl implements ProductService {
                 ))
                 .toList();
 
+        List<String> images = product.getImages().stream()
+                .map(ProductImage::getUrl)
+                .toList();
+
         return new ProductResponse(
                 product.getId(),
                 product.getSku(),
@@ -183,9 +201,9 @@ public class ProductServiceImpl implements ProductService {
                 product.getStockAlertThreshold(),
                 product.getCostPrice(),
                 product.getPrice(),
-                product.getImgUrl(),
                 product.getIsActive(),
                 product.getIsCatalog(),
+                images,
                 categories
         );
     }
