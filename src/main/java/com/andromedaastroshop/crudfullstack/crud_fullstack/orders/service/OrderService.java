@@ -9,19 +9,17 @@ import java.util.List;
 
 public interface OrderService {
 
-    OrderResponse create(CreateOrderRequest request);
+    OrderResponse create(CreateOrderRequest request, Long userId);
 
     OrderResponse findById(Long id);
 
     List<OrderResponse> findByUserId(Long userId);
 
-    OrderResponse findBySku(String sku);
-
     List<OrderResponse> findAll();
 
     List<OrderResponse> findByStatus(OrderStatus status);
 
-    OrderResponse updateStutus(Long id, UpdateOrderStatusRequest request);
+    OrderResponse updateStatus(Long id, UpdateOrderStatusRequest request);
 
     OrderResponse cancel(Long id, Long userId);
 
