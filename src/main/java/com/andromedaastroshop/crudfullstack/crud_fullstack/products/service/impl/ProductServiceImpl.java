@@ -158,7 +158,14 @@ public class ProductServiceImpl implements ProductService {
 
     private ProductResponse mapToProductResponse(Product product) {
         List<CategoryResponse> categories = product.getCategories().stream()
-                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getDescription(), c.getSlug(), c.getCreatedAt(), c.getUpdatedAt()))
+                .map(category -> new CategoryResponse(
+                        category.getId(),
+                        category.getName(),
+                        category.getDescription(),
+                        category.getSlug(),
+                        category.getCreatedAt(),
+                        category.getUpdatedAt()
+                ))
                 .toList();
 
         return new ProductResponse(
