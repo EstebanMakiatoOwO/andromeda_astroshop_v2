@@ -2,6 +2,7 @@ package com.andromedaastroshop.crudfullstack.crud_fullstack.stock.service.impl;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.model.Product;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.repository.ProductRepository;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.InsufficientStockException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.stock.dto.CreateStockMovementRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.stock.dto.StockMovementResponse;
@@ -41,6 +42,15 @@ public class StockMovementServiceImpl implements StockMovementService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         int stockBefore = product.getStock();
+
+        if ((request.type() == MovementType.SALE || request.type() == MovementType.ADJUSTMENT_OUT)
+                && stockBefore < request.quantity()) {
+            throw new InsufficientStockException(
+                    "Stock insuficiente para el producto '" + product.getName() +
+                    "'. Stock actual: " + stockBefore + ", cantidad solicitada: " + request.quantity()
+            );
+        }
+
         int stockAfter = calculateStockAfter(request.type(), stockBefore, request.quantity());
 
         product.setStock(stockAfter);

@@ -101,7 +101,7 @@ public class Product {
         this.id = id;
     }
 
-        public LocalDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
