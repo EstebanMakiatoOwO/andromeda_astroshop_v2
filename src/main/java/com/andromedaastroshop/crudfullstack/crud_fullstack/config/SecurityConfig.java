@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/api/v1/orders/webhook/**").permitAll()
+                        .requestMatchers("/api/v1/payments/webhook").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/orders").permitAll()
                         .anyRequest().authenticated()
                 )
