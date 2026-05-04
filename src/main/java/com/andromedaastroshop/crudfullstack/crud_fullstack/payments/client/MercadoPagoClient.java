@@ -2,7 +2,6 @@ package com.andromedaastroshop.crudfullstack.crud_fullstack.payments.client;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.Order;
 import com.mercadopago.client.payment.PaymentClient;
-import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
@@ -21,38 +20,28 @@ public class MercadoPagoClient {
     @Value("${mercadopago.webhook-url}")
     private String webhookUrl;
 
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
-
-    public String createPreference(Order order) {
+    public PreferenceData createPreference(Order order) {
         List<PreferenceItemRequest> items = order.getItems().stream()
                 .map(item -> PreferenceItemRequest.builder()
                         .id(String.valueOf(item.getProduct().getId()))
                         .title(item.getProduct().getName())
                         .quantity(item.getQuantity())
                         .unitPrice(item.getUnitPrice())
-                        .currencyId("ARS")
                         .build())
                 .toList();
-
-        PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                .success(frontendUrl + "/checkout/success")
-                .failure(frontendUrl + "/checkout/failure")
-                .pending(frontendUrl + "/checkout/pending")
-                .build();
 
         PreferenceRequest request = PreferenceRequest.builder()
                 .items(items)
                 .externalReference(String.valueOf(order.getId()))
                 .notificationUrl(webhookUrl)
-                .backUrls(backUrls)
-                .autoReturn("approved")
                 .build();
 
         try {
             Preference preference = new PreferenceClient().create(request);
-            return preference.getId();
-        } catch (MPApiException | MPException e) {
+            return new PreferenceData(preference.getId(), preference.getSandboxInitPoint());
+        } catch (MPApiException e) {
+            throw new RuntimeException("Error al crear preferencia en MercadoPago [" + e.getStatusCode() + "]: " + e.getApiResponse().getContent(), e);
+        } catch (MPException e) {
             throw new RuntimeException("Error al crear preferencia en MercadoPago: " + e.getMessage(), e);
         }
     }
