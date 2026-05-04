@@ -4,14 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record MercadoPagoPaymentData(
-        String id,
+        Long id,
         String status,
-        String preferenceId,
-        String merchantOrderId,
+        String externalReference,
+        Long merchantOrderId,
         String paymentMethodId,
         BigDecimal transactionAmount,
         String currencyId,
         String payerEmail,
-        LocalDateTime dateApproved,
-        String rawResponse
+        LocalDateTime dateApproved
 ) {}
