@@ -46,6 +46,9 @@ public class Order {
 
     private String mpPreferenceId;
 
+    @Column(name = "checkout_url")
+    private String checkoutUrl;
+
     @Column(length = 500)
     private String notes;
 
@@ -85,6 +88,9 @@ public class Order {
 
     public String getMpPreferenceId() { return mpPreferenceId; }
     public void setMpPreferenceId(String mpPreferenceId) { this.mpPreferenceId = mpPreferenceId; }
+
+    public String getCheckoutUrl() { return checkoutUrl; }
+    public void setCheckoutUrl(String checkoutUrl) { this.checkoutUrl = checkoutUrl; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

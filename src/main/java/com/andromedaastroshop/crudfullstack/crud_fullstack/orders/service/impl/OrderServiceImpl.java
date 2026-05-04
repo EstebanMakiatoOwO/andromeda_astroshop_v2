@@ -9,6 +9,8 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.OrderIte
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.OrderStatus;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.repository.OrderRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.service.OrderService;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.payments.client.MercadoPagoClient;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.payments.client.PreferenceData;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.model.Product;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.repository.ProductRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.InsufficientStockException;
@@ -29,13 +31,16 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final MercadoPagoClient mercadoPagoClient;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             ProductRepository productRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            MercadoPagoClient mercadoPagoClient) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.mercadoPagoClient = mercadoPagoClient;
     }
 
     @Override
@@ -102,7 +107,11 @@ public class OrderServiceImpl implements OrderService {
         order.setTotal(subtotal.add(request.shippingCost()));
         order.setNotes(request.notes());
 
-        return mapToOrderResponse(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        PreferenceData preference = mercadoPagoClient.createPreference(savedOrder);
+        savedOrder.setMpPreferenceId(preference.preferenceId());
+        savedOrder.setCheckoutUrl(preference.checkoutUrl());
+        return mapToOrderResponse(orderRepository.save(savedOrder));
     }
 
     @Override
@@ -205,6 +214,7 @@ public class OrderServiceImpl implements OrderService {
                 order.getShippingCost(),
                 order.getTotal(),
                 order.getMpPreferenceId(),
+                order.getCheckoutUrl(),
                 order.getNotes(),
                 items,
                 order.getCreatedAt(),
