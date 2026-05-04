@@ -16,6 +16,7 @@ public record OrderResponse(
         BigDecimal shippingCost,
         BigDecimal total,
         String mpPreferenceId,
+        String checkoutUrl,
         String notes,
         List<OrderItemResponse> items,
         LocalDateTime createdAt,

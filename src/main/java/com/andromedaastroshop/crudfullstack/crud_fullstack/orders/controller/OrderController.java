@@ -79,9 +79,4 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponse.success("Estado actualizado", orderService.updateStatus(id, request)));
     }
 
-    @PostMapping("/webhook/payment")
-    public ResponseEntity<Void> handlePaymentWebhook(@RequestParam String preferenceId) {
-        orderService.handlePaymentConfirmed(preferenceId);
-        return ResponseEntity.ok().build();
-    }
 }
