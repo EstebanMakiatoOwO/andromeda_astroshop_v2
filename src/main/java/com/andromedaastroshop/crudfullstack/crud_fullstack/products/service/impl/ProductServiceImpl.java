@@ -126,7 +126,6 @@ public class ProductServiceImpl implements ProductService {
             product.setBarcode(newBarcode);
         }
 
-        product.setBarcode(request.barcode());
         product.setName(request.name());
         product.setShortDescription(request.shortDescription());
         product.setLongDescription(request.longDescription());
