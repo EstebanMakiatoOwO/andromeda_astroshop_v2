@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.payments.service.impl;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.loyalty.service.LoyaltyService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.Order;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.repository.OrderRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.service.OrderService;
@@ -25,15 +26,18 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final OrderService orderService;
     private final MercadoPagoClient mercadoPagoClient;
+    private final LoyaltyService loyaltyService;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository,
                               OrderRepository orderRepository,
                               OrderService orderService,
-                              MercadoPagoClient mercadoPagoClient) {
+                              MercadoPagoClient mercadoPagoClient,
+                              LoyaltyService loyaltyService) {
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
         this.orderService = orderService;
         this.mercadoPagoClient = mercadoPagoClient;
+        this.loyaltyService = loyaltyService;
     }
 
     @Override
@@ -67,6 +71,9 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
         if (newStatus == PaymentStatus.APPROVED) {
             orderService.handlePaymentConfirmed(payment.getOrder().getMpPreferenceId());
+            loyaltyService.earnPoints(payment.getOrder());
+        } else if (newStatus == PaymentStatus.REFUNDED) {
+            loyaltyService.reversePoints(payment.getOrder());
         }
     }
 
@@ -93,6 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (status == PaymentStatus.APPROVED) {
             orderService.handlePaymentConfirmed(order.getMpPreferenceId());
+            loyaltyService.earnPoints(order);
         }
     }
 

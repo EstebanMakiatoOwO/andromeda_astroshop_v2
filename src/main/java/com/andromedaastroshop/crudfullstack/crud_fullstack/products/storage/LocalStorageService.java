@@ -54,8 +54,9 @@ public class LocalStorageService implements StorageService {
     }
 
     @Override
-    public void delete(String fileName) {
+    public void delete(String url) {
         try {
+            String fileName = url.substring(url.lastIndexOf('/') + 1);
             Path filePath = rootLocation.resolve(fileName);
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
