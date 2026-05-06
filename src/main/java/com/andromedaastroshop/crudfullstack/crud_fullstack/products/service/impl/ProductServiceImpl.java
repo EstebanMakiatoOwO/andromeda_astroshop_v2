@@ -155,6 +155,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
+        product.getImages().forEach(img -> storageService.delete(img.getUrl()));
         productRepository.delete(product);
         return "Product deleted successfully";
     }
