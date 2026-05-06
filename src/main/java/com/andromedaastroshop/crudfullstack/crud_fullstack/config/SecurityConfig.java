@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/reviews/product/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/currency/rate").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/orders").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/products/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/categories/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
