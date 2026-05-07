@@ -2,6 +2,7 @@ package com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.impl;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceAlreadyExistsException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.JwtRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.LoginRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.RegisterRequest;
@@ -57,6 +58,21 @@ public class AuthServiceImpl implements AuthService {
         // Si la autenticación es exitosa, buscamos el usuario para generar el token
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found after authentication")); 
+        return new JwtRespose(user.getName(), jwtService.generateToken(user.getEmail()));
+    }
+
+    @Override
+    public JwtRespose adminLogin(LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+        );
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found after authentication"));
+
+        if (user.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("Acceso restringido a administradores");
+        }
+
         return new JwtRespose(user.getName(), jwtService.generateToken(user.getEmail()));
     }
 

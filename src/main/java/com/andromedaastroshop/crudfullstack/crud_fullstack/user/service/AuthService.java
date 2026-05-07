@@ -10,4 +10,6 @@ public interface AuthService {
     UserRespose register(RegisterRequest request);
 
     JwtRespose login(LoginRequest request);
+
+    JwtRespose adminLogin(LoginRequest request);
 }
