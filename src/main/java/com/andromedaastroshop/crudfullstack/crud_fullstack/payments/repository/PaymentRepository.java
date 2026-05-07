@@ -31,6 +31,19 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Object[]> findDailySalesSince(@Param("status") PaymentStatus status,
                                        @Param("from") LocalDateTime from);
 
+    @Query("SELECT FUNCTION('HOUR', p.paidAt), SUM(p.amount) FROM Payment p " +
+           "WHERE p.status = :status AND p.paidAt >= :from " +
+           "GROUP BY FUNCTION('HOUR', p.paidAt) ORDER BY FUNCTION('HOUR', p.paidAt) ASC")
+    List<Object[]> findHourlySalesSince(@Param("status") PaymentStatus status,
+                                        @Param("from") LocalDateTime from);
+
+    @Query("SELECT FUNCTION('HOUR', p.paidAt), FUNCTION('MINUTE', p.paidAt), SUM(p.amount) FROM Payment p " +
+           "WHERE p.status = :status AND p.paidAt >= :from " +
+           "GROUP BY FUNCTION('HOUR', p.paidAt), FUNCTION('MINUTE', p.paidAt) " +
+           "ORDER BY FUNCTION('HOUR', p.paidAt) ASC, FUNCTION('MINUTE', p.paidAt) ASC")
+    List<Object[]> findMinutelySalesSince(@Param("status") PaymentStatus status,
+                                          @Param("from") LocalDateTime from);
+
     @Query("SELECT c.name, SUM(oi.subtotal) FROM Payment pay " +
            "JOIN pay.order o JOIN o.items oi JOIN oi.product pr JOIN pr.categories c " +
            "WHERE pay.status = :status " +

@@ -95,6 +95,48 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.delete(review);
     }
 
+    @Override
+    public List<ReviewResponse> findUnreplied() {
+        return reviewRepository.findByAdminReplyIsNullOrderByCreatedAtDesc().stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void markAsSeen(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Reseña no encontrada con id: " + reviewId));
+        review.setSeenByAdmin(true);
+        reviewRepository.save(review);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void markAllSeen() {
+        reviewRepository.markAllAsSeen();
+    }
+
+    @Override
+    public long countUnseen() {
+        return reviewRepository.countBySeenByAdminFalse();
+    }
+
+    @Override
+    public List<ReviewResponse> findAll() {
+        return reviewRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public ReviewResponse adminReply(Long id, String reply) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reseña no encontrada con id: " + id));
+        review.setAdminReply(reply);
+        return mapToResponse(reviewRepository.save(review));
+    }
+
     private ReviewResponse mapToResponse(Review review) {
         return new ReviewResponse(
                 review.getId(),
@@ -104,6 +146,7 @@ public class ReviewServiceImpl implements ReviewService {
                 review.getProduct().getName(),
                 review.getRating(),
                 review.getComment(),
+                review.getAdminReply(),
                 review.getCreatedAt(),
                 review.getUpdatedAt()
         );

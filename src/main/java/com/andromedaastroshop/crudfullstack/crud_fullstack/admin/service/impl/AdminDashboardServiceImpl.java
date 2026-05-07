@@ -56,22 +56,42 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     @Override
     public List<SalesDataPoint> getSalesByPeriod(String period) {
-        int days = switch (period) {
-            case "1d"  -> 1;
-            case "7d"  -> 7;
-            case "90d" -> 90;
-            default    -> 30;
+        return switch (period) {
+            case "1h" -> {
+                LocalDateTime from = LocalDateTime.now().minusHours(1);
+                yield paymentRepository.findMinutelySalesSince(PaymentStatus.APPROVED, from).stream()
+                        .map(row -> new SalesDataPoint(
+                                String.format("%02d:%02d",
+                                        ((Number) row[0]).intValue(),
+                                        ((Number) row[1]).intValue()),
+                                (BigDecimal) row[2]
+                        ))
+                        .toList();
+            }
+            case "1d" -> {
+                LocalDateTime from = LocalDateTime.now().minusDays(1);
+                yield paymentRepository.findHourlySalesSince(PaymentStatus.APPROVED, from).stream()
+                        .map(row -> new SalesDataPoint(
+                                String.format("%02d:00", ((Number) row[0]).intValue()),
+                                (BigDecimal) row[1]
+                        ))
+                        .toList();
+            }
+            default -> {
+                int days = switch (period) {
+                    case "7d"  -> 7;
+                    case "90d" -> 90;
+                    default    -> 30;
+                };
+                LocalDateTime from = LocalDateTime.now().minusDays(days);
+                yield paymentRepository.findDailySalesSince(PaymentStatus.APPROVED, from).stream()
+                        .map(row -> new SalesDataPoint(
+                                ((java.sql.Date) row[0]).toLocalDate().toString(),
+                                (BigDecimal) row[1]
+                        ))
+                        .toList();
+            }
         };
-
-        LocalDateTime from = LocalDateTime.now().minusDays(days);
-        List<Object[]> rows = paymentRepository.findDailySalesSince(PaymentStatus.APPROVED, from);
-
-        return rows.stream()
-                .map(row -> new SalesDataPoint(
-                        ((java.sql.Date) row[0]).toLocalDate(),
-                        (BigDecimal) row[1]
-                ))
-                .toList();
     }
 
     @Override

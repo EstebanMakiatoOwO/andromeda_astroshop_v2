@@ -13,4 +13,16 @@ public interface ReviewService {
     List<ReviewResponse> findByCurrentUser(User currentUser);
     ReviewResponse update(Long id, UpdateReviewRequest request, User currentUser);
     void delete(Long id, User currentUser);
+
+    ReviewResponse adminReply(Long id, String reply);
+
+    List<ReviewResponse> findAll();
+
+    List<ReviewResponse> findUnreplied();
+
+    void markAsSeen(Long reviewId);
+
+    void markAllSeen();
+
+    long countUnseen();
 }

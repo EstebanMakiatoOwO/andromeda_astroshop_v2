@@ -35,6 +35,12 @@ public class Review {
     @Column(length = 1000)
     private String comment;
 
+    @Column(length = 1000)
+    private String adminReply;
+
+    @Column(nullable = false)
+    private boolean seenByAdmin = false;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -56,6 +62,12 @@ public class Review {
 
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
+
+    public String getAdminReply() { return adminReply; }
+    public void setAdminReply(String adminReply) { this.adminReply = adminReply; }
+
+    public boolean isSeenByAdmin() { return seenByAdmin; }
+    public void setSeenByAdmin(boolean seenByAdmin) { this.seenByAdmin = seenByAdmin; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

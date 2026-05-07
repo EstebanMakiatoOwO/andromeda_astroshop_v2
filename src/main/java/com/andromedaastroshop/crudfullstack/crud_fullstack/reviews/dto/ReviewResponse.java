@@ -10,6 +10,7 @@ public record ReviewResponse(
         String productName,
         Integer rating,
         String comment,
+        String adminReply,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}
