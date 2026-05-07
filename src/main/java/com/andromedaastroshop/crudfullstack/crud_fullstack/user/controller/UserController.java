@@ -43,6 +43,11 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllUsers());
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<UserRespose>> search(@RequestParam String q) {
+        return ResponseEntity.ok(userService.search(q));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserRespose> updateUser(@PathVariable Long id,@RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateById(id, request));

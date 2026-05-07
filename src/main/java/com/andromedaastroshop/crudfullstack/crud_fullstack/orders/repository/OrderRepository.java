@@ -41,4 +41,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT COALESCE(AVG(o.total), 0) FROM Order o WHERE o.status = :status AND o.createdAt >= :from")
     BigDecimal avgTotalByStatusSince(@Param("status") OrderStatus status, @Param("from") LocalDateTime from);
+
+    @Query("SELECT o FROM Order o WHERE " +
+           "LOWER(o.guestName) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "LOWER(o.guestEmail) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
+           "CAST(o.id AS string) LIKE CONCAT('%', :q, '%') " +
+           "ORDER BY o.createdAt DESC")
+    List<Order> searchByQuery(@Param("q") String q);
 }

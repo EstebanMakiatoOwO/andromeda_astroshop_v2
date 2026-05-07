@@ -191,6 +191,14 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
+    @Override
+    public List<OrderResponse> search(String q) {
+        return orderRepository.searchByQuery(q)
+                .stream()
+                .map(this::mapToOrderResponse)
+                .toList();
+    }
+
     private OrderResponse mapToOrderResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> new OrderItemResponse(

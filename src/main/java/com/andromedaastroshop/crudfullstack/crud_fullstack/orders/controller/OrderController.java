@@ -71,6 +71,12 @@ public class OrderController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> search(@RequestParam String q) {
+        return ResponseEntity.ok(ApiResponse.success("Órdenes encontradas", orderService.search(q)));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<OrderResponse>> updateStatus(
             @PathVariable Long id,

@@ -24,4 +24,6 @@ public interface OrderService {
     OrderResponse cancel(Long id, Long userId);
 
     void handlePaymentConfirmed(String mpPreferenceId);
+
+    List<OrderResponse> search(String q);
 }

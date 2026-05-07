@@ -21,4 +21,6 @@ public interface UserService {
     UserRespose updateById(Long id, UpdateUserRequest request);
 
     String deleteById(Long id);
+
+    List<UserRespose> search(String q);
 }
