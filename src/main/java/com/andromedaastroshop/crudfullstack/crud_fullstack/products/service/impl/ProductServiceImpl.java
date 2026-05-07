@@ -167,6 +167,17 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
+    @Override
+    public ProductResponse updateCategories(Long id, List<Long> categoryIds) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        product.setCategories(resolveCategories(categoryIds));
+        productRepository.save(product);
+
+        return mapToProductResponse(productRepository.findById(id).orElseThrow());
+    }
+
     private Set<Category> resolveCategories(List<Long> categoryIds) {
         if (categoryIds == null || categoryIds.isEmpty()) return new HashSet<>();
         return new HashSet<>(categoryRepository.findAllById(categoryIds));

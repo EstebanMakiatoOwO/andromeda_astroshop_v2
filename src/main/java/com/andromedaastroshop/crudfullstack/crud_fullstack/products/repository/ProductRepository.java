@@ -32,4 +32,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByBarcode(String barcode);
 
     List<Product> findByCategoriesId(Long categoryId);
+
+    @Query("SELECT p FROM Product p WHERE p.isActive = true AND (p.stock = 0 OR (p.stockAlertThreshold IS NOT NULL AND p.stock <= p.stockAlertThreshold)) ORDER BY p.stock ASC")
+    List<Product> findLowStockProducts();
 }

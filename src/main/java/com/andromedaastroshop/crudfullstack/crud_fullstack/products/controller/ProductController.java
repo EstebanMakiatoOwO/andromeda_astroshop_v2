@@ -91,4 +91,14 @@ public class ProductController {
                 ApiResponse.success("Productos encontrados", productService.findByCategory(categoryId))
         );
     }
+
+    @PatchMapping("/{id}/categories")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateCategories(
+            @PathVariable Long id,
+            @RequestBody List<Long> categoryIds
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Categorías actualizadas", productService.updateCategories(id, categoryIds))
+        );
+    }
 }
