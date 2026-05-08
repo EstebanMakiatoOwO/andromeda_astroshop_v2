@@ -13,7 +13,7 @@ public interface AdminDashboardService {
     List<OrderResponse> getRecentOrders(int size);
     List<LowStockResponse> getLowStockProducts();
 
-    Page<OrderResponse> getOrdersPaginated(int page, int size, String status, String q);
+    Page<OrderResponse> getOrdersPaginated(int page, int size, String status, String q, String dateFrom, String dateTo);
     OrderCountsResponse getOrderCounts();
     OrderDetailResponse getOrderDetail(Long id);
     OrderResponse updateOrderNotes(Long id, String notes);

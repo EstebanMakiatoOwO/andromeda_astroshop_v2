@@ -143,7 +143,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     }
 
     @Override
-    public Page<OrderResponse> getOrdersPaginated(int page, int size, String status, String q) {
+    public Page<OrderResponse> getOrdersPaginated(int page, int size, String status, String q, String dateFrom, String dateTo) {
         Specification<Order> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -160,6 +160,18 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                     search.add(cb.equal(root.get("id"), Long.parseLong(q)));
                 } catch (NumberFormatException ignored) {}
                 predicates.add(cb.or(search.toArray(new Predicate[0])));
+            }
+
+            if (dateFrom != null && !dateFrom.isBlank()) {
+                predicates.add(cb.greaterThanOrEqualTo(
+                        root.get("createdAt"), LocalDate.parse(dateFrom).atStartOfDay()
+                ));
+            }
+
+            if (dateTo != null && !dateTo.isBlank()) {
+                predicates.add(cb.lessThanOrEqualTo(
+                        root.get("createdAt"), LocalDate.parse(dateTo).atTime(LocalTime.MAX)
+                ));
             }
 
             query.orderBy(cb.desc(root.get("createdAt")));

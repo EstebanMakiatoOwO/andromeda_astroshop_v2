@@ -76,10 +76,12 @@ public class AdminDashboardController {
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false)    String status,
-            @RequestParam(required = false)    String q
+            @RequestParam(required = false)    String q,
+            @RequestParam(required = false)    String dateFrom,
+            @RequestParam(required = false)    String dateTo
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success("Órdenes obtenidas", dashboardService.getOrdersPaginated(page, size, status, q))
+                ApiResponse.success("Órdenes obtenidas", dashboardService.getOrdersPaginated(page, size, status, q, dateFrom, dateTo))
         );
     }
 
