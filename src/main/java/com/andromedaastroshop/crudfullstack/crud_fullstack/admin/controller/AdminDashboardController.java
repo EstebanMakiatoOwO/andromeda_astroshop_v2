@@ -8,6 +8,7 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.*;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.service.AdminDashboardService;
 import org.springframework.data.domain.Page;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.OrderResponse;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.UpdateOrderStatusRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.service.OrderService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto.ProductResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.service.ProductService;
@@ -96,6 +97,23 @@ public class AdminDashboardController {
     public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetail(@PathVariable Long id) {
         return ResponseEntity.ok(
                 ApiResponse.success("Orden obtenida", dashboardService.getOrderDetail(id))
+        );
+    }
+
+    @PatchMapping("/orders/{id}/status")
+    public ResponseEntity<ApiResponse<OrderResponse>> updateOrderStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateOrderStatusRequest request
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Estado actualizado", orderService.updateStatus(id, request))
+        );
+    }
+
+    @PatchMapping("/orders/{id}/cancel")
+    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Orden cancelada", orderService.adminCancel(id))
         );
     }
 

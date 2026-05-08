@@ -188,6 +188,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    public OrderResponse adminCancel(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada: " + id));
+
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.REFUNDED) {
+            throw new OrderNotModifiableException("La orden ya está en estado " + order.getStatus() + " y no puede modificarse");
+        }
+
+        order.getItems().forEach(item -> {
+            if (!Boolean.TRUE.equals(item.getIsCatalog())) {
+                productRepository.incrementStock(item.getProduct().getId(), item.getQuantity());
+            }
+        });
+
+        order.setStatus(OrderStatus.CANCELLED);
+        return mapToOrderResponse(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
     public void handlePaymentConfirmed(String mpPreferenceId) {
         Order order = orderRepository.findByMpPreferenceId(mpPreferenceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada para preferenceId: " + mpPreferenceId));

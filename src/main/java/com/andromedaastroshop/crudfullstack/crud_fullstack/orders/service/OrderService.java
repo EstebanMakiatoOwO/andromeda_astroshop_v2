@@ -23,6 +23,8 @@ public interface OrderService {
 
     OrderResponse cancel(Long id, Long userId);
 
+    OrderResponse adminCancel(Long id);
+
     void handlePaymentConfirmed(String mpPreferenceId);
 
     List<OrderResponse> search(String q);
