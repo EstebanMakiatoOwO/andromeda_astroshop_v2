@@ -52,6 +52,10 @@ public class OrderServiceImpl implements OrderService {
             order.setUser(userRepository.findById(userId)
                     .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado")));
         } else {
+            if (request.guestName() == null || request.guestName().isBlank())
+                throw new IllegalArgumentException("El nombre es obligatorio para invitados");
+            if (request.guestEmail() == null || request.guestEmail().isBlank())
+                throw new IllegalArgumentException("El email es obligatorio para invitados");
             order.setGuestEmail(request.guestEmail());
             order.setGuestName(request.guestName());
         }

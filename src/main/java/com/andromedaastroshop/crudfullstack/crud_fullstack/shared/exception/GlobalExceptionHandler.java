@@ -70,6 +70,12 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("El cuerpo de la petición es inválido o contiene un valor no permitido", null));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage(), null));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

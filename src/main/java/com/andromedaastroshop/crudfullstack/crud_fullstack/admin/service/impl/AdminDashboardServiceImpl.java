@@ -163,18 +163,19 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
             }
 
             if (dateFrom != null && !dateFrom.isBlank()) {
-                predicates.add(cb.greaterThanOrEqualTo(
-                        root.get("createdAt"), LocalDate.parse(dateFrom).atStartOfDay()
-                ));
+                LocalDateTime from = dateFrom.contains("T")
+                        ? LocalDateTime.parse(dateFrom)
+                        : LocalDate.parse(dateFrom).atStartOfDay();
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), from));
             }
 
             if (dateTo != null && !dateTo.isBlank()) {
-                predicates.add(cb.lessThanOrEqualTo(
-                        root.get("createdAt"), LocalDate.parse(dateTo).atTime(LocalTime.MAX)
-                ));
+                LocalDateTime to = dateTo.contains("T")
+                        ? LocalDateTime.parse(dateTo)
+                        : LocalDate.parse(dateTo).atTime(LocalTime.MAX);
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), to));
             }
 
-            query.orderBy(cb.desc(root.get("createdAt")));
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
