@@ -52,6 +52,21 @@ public class Order {
     @Column(length = 500)
     private String notes;
 
+    @Column(length = 200)
+    private String shippingStreet;
+
+    @Column(length = 100)
+    private String shippingCity;
+
+    @Column(length = 100)
+    private String shippingState;
+
+    @Column(length = 20)
+    private String shippingZipCode;
+
+    @Column(length = 100)
+    private String shippingCountry;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -94,6 +109,21 @@ public class Order {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getShippingStreet() { return shippingStreet; }
+    public void setShippingStreet(String shippingStreet) { this.shippingStreet = shippingStreet; }
+
+    public String getShippingCity() { return shippingCity; }
+    public void setShippingCity(String shippingCity) { this.shippingCity = shippingCity; }
+
+    public String getShippingState() { return shippingState; }
+    public void setShippingState(String shippingState) { this.shippingState = shippingState; }
+
+    public String getShippingZipCode() { return shippingZipCode; }
+    public void setShippingZipCode(String shippingZipCode) { this.shippingZipCode = shippingZipCode; }
+
+    public String getShippingCountry() { return shippingCountry; }
+    public void setShippingCountry(String shippingCountry) { this.shippingCountry = shippingCountry; }
 
     public List<OrderItem> getItems() { return items; }
     public void setItems(List<OrderItem> items) { this.items = items; }

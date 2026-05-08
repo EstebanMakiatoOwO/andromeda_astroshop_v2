@@ -4,9 +4,9 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.CategoryRev
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.DashboardStatsResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.LowStockResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.SalesDataPoint;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.AdminReplyRequest;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.NotificationResponse;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.*;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.service.AdminDashboardService;
+import org.springframework.data.domain.Page;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.OrderResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.service.OrderService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto.ProductResponse;
@@ -72,11 +72,38 @@ public class AdminDashboardController {
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<ApiResponse<List<OrderResponse>>> getRecentOrders(
-            @RequestParam(defaultValue = "5") int size
+    public ResponseEntity<ApiResponse<Page<OrderResponse>>> getOrders(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false)    String status,
+            @RequestParam(required = false)    String q
     ) {
         return ResponseEntity.ok(
-                ApiResponse.success("Órdenes obtenidas", dashboardService.getRecentOrders(size))
+                ApiResponse.success("Órdenes obtenidas", dashboardService.getOrdersPaginated(page, size, status, q))
+        );
+    }
+
+    @GetMapping("/orders/counts")
+    public ResponseEntity<ApiResponse<OrderCountsResponse>> getOrderCounts() {
+        return ResponseEntity.ok(
+                ApiResponse.success("Conteos obtenidos", dashboardService.getOrderCounts())
+        );
+    }
+
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Orden obtenida", dashboardService.getOrderDetail(id))
+        );
+    }
+
+    @PatchMapping("/orders/{id}/notes")
+    public ResponseEntity<ApiResponse<OrderResponse>> updateOrderNotes(
+            @PathVariable Long id,
+            @RequestBody UpdateOrderNotesRequest request
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success("Nota actualizada", dashboardService.updateOrderNotes(id, request.notes()))
         );
     }
 

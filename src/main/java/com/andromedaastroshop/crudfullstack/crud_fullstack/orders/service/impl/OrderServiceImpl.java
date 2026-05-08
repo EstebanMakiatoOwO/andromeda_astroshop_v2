@@ -106,6 +106,11 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingCost(request.shippingCost());
         order.setTotal(subtotal.add(request.shippingCost()));
         order.setNotes(request.notes());
+        order.setShippingStreet(request.shippingStreet());
+        order.setShippingCity(request.shippingCity());
+        order.setShippingState(request.shippingState());
+        order.setShippingZipCode(request.shippingZipCode());
+        order.setShippingCountry(request.shippingCountry());
 
         Order savedOrder = orderRepository.save(order);
         PreferenceData preference = mercadoPagoClient.createPreference(savedOrder);
@@ -224,6 +229,11 @@ public class OrderServiceImpl implements OrderService {
                 order.getMpPreferenceId(),
                 order.getCheckoutUrl(),
                 order.getNotes(),
+                order.getShippingStreet(),
+                order.getShippingCity(),
+                order.getShippingState(),
+                order.getShippingZipCode(),
+                order.getShippingCountry(),
                 items,
                 order.getCreatedAt(),
                 order.getUpdatedAt()

@@ -1,11 +1,8 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,5 +24,25 @@ public record CreateOrderRequest(
         BigDecimal shippingCost,
 
         @Size(max = 500, message = "Las notas no pueden superar los 500 caracteres")
-        String notes
+        String notes,
+
+        @NotBlank(message = "La calle es obligatoria")
+        @Size(max = 200)
+        String shippingStreet,
+
+        @NotBlank(message = "La ciudad es obligatoria")
+        @Size(max = 100)
+        String shippingCity,
+
+        @NotBlank(message = "El estado es obligatorio")
+        @Size(max = 100)
+        String shippingState,
+
+        @NotBlank(message = "El código postal es obligatorio")
+        @Size(max = 20)
+        String shippingZipCode,
+
+        @NotBlank(message = "El país es obligatorio")
+        @Size(max = 100)
+        String shippingCountry
 ) {}

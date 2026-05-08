@@ -18,6 +18,11 @@ public record OrderResponse(
         String mpPreferenceId,
         String checkoutUrl,
         String notes,
+        String shippingStreet,
+        String shippingCity,
+        String shippingState,
+        String shippingZipCode,
+        String shippingCountry,
         List<OrderItemResponse> items,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

@@ -1,26 +1,31 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.admin.service.impl;
 
-import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.CategoryRevenueResponse;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.DashboardStatsResponse;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.LowStockResponse;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.SalesDataPoint;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.*;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.service.AdminDashboardService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.OrderItemResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.OrderResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.Order;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.OrderStatus;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.repository.OrderRepository;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.payments.model.Payment;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.payments.model.PaymentStatus;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.payments.repository.PaymentRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.repository.ProductRepository;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.shared.exception.ResourceNotFoundException;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -137,6 +142,85 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .toList();
     }
 
+    @Override
+    public Page<OrderResponse> getOrdersPaginated(int page, int size, String status, String q) {
+        Specification<Order> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (status != null && !status.isBlank()) {
+                predicates.add(cb.equal(root.get("status"), OrderStatus.valueOf(status)));
+            }
+
+            if (q != null && !q.isBlank()) {
+                String like = "%" + q.toLowerCase() + "%";
+                List<Predicate> search = new ArrayList<>();
+                search.add(cb.like(cb.lower(root.get("guestName")), like));
+                search.add(cb.like(cb.lower(root.get("guestEmail")), like));
+                try {
+                    search.add(cb.equal(root.get("id"), Long.parseLong(q)));
+                } catch (NumberFormatException ignored) {}
+                predicates.add(cb.or(search.toArray(new Predicate[0])));
+            }
+
+            query.orderBy(cb.desc(root.get("createdAt")));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return orderRepository
+                .findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")))
+                .map(this::mapToOrderResponse);
+    }
+
+    @Override
+    public OrderCountsResponse getOrderCounts() {
+        return new OrderCountsResponse(
+                orderRepository.countByStatus(OrderStatus.PENDING),
+                orderRepository.countByStatus(OrderStatus.PAID),
+                orderRepository.countByStatus(OrderStatus.SHIPPED),
+                orderRepository.countByStatus(OrderStatus.CANCELLED),
+                orderRepository.countByStatus(OrderStatus.REFUNDED),
+                orderRepository.count()
+        );
+    }
+
+    @Override
+    public OrderDetailResponse getOrderDetail(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada: " + id));
+
+        PaymentDetailDto paymentDto = paymentRepository
+                .findByOrderIdOrderByCreatedAtDesc(id)
+                .stream()
+                .filter(p -> p.getStatus() == PaymentStatus.APPROVED)
+                .findFirst()
+                .map(this::mapToPaymentDetail)
+                .orElse(null);
+
+        return new OrderDetailResponse(mapToOrderResponse(order), paymentDto);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse updateOrderNotes(Long id, String notes) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada: " + id));
+        order.setNotes(notes);
+        return mapToOrderResponse(orderRepository.save(order));
+    }
+
+    private PaymentDetailDto mapToPaymentDetail(Payment p) {
+        return new PaymentDetailDto(
+                p.getId(),
+                p.getMpPaymentId(),
+                p.getPaymentMethod(),
+                p.getPayerEmail(),
+                p.getAmount(),
+                p.getCurrencyId(),
+                p.getStatus(),
+                p.getPaidAt()
+        );
+    }
+
     private OrderResponse mapToOrderResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> new OrderItemResponse(
@@ -162,6 +246,11 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 order.getMpPreferenceId(),
                 order.getCheckoutUrl(),
                 order.getNotes(),
+                order.getShippingStreet(),
+                order.getShippingCity(),
+                order.getShippingState(),
+                order.getShippingZipCode(),
+                order.getShippingCountry(),
                 items,
                 order.getCreatedAt(),
                 order.getUpdatedAt()
