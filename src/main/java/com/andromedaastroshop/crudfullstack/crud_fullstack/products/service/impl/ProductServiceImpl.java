@@ -1,5 +1,7 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.products.service.impl;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.brands.dto.BrandResponse;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.brands.repository.BrandRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.dto.CategoryResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.model.Category;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.repository.CategoryRepository;
@@ -27,15 +29,18 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
     private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
     private final StorageService storageService;
 
     public ProductServiceImpl(ProductRepository productRepository,
                               ProductImageRepository productImageRepository,
                               CategoryRepository categoryRepository,
+                              BrandRepository brandRepository,
                               StorageService storageService) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.categoryRepository = categoryRepository;
+        this.brandRepository = brandRepository;
         this.storageService = storageService;
     }
 
@@ -64,6 +69,10 @@ public class ProductServiceImpl implements ProductService {
         product.setIsActive(request.isActive());
         product.setIsCatalog(Boolean.TRUE.equals(request.isCatalog()));
         product.setCategories(resolveCategories(request.categoryIds()));
+        if (request.brandId() != null) {
+            product.setBrand(brandRepository.findById(request.brandId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Brand no encontrada con id: " + request.brandId())));
+        }
 
         Product savedProduct = productRepository.save(product);
 
@@ -136,6 +145,10 @@ public class ProductServiceImpl implements ProductService {
         product.setIsActive(request.isActive());
         product.setIsCatalog(Boolean.TRUE.equals(request.isCatalog()));
         product.setCategories(resolveCategories(request.categoryIds()));
+        product.setBrand(request.brandId() != null
+                ? brandRepository.findById(request.brandId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Brand no encontrada con id: " + request.brandId()))
+                : null);
 
         Product updatedProduct = productRepository.save(product);
 
@@ -199,6 +212,11 @@ public class ProductServiceImpl implements ProductService {
                 .map(ProductImage::getUrl)
                 .toList();
 
+        BrandResponse brand = product.getBrand() != null
+                ? new BrandResponse(product.getBrand().getId(), product.getBrand().getName(),
+                        product.getBrand().getDescription(), product.getBrand().getLogoUrl())
+                : null;
+
         return new ProductResponse(
                 product.getId(),
                 product.getSku(),
@@ -215,7 +233,8 @@ public class ProductServiceImpl implements ProductService {
                 product.getIsActive(),
                 product.getIsCatalog(),
                 images,
-                categories
+                categories,
+                brand
         );
     }
 }

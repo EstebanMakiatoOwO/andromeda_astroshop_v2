@@ -1,18 +1,17 @@
-package com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto;
+package com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.brands.dto.BrandResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.dto.CategoryResponse;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.products.model.ProductStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record ProductResponse(
+public record AdminProductResponse(
         Long id,
         String sku,
         String barcode,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
         String name,
         String shortDescription,
         String longDescription,
@@ -22,8 +21,10 @@ public record ProductResponse(
         BigDecimal price,
         Boolean isActive,
         Boolean isCatalog,
+        ProductStatus status,
         List<String> images,
         List<CategoryResponse> categories,
-        BrandResponse brand
-) {
-}
+        BrandResponse brand,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {}

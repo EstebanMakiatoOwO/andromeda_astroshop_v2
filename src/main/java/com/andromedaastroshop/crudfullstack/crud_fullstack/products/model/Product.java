@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.products.model;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.brands.model.Brand;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.model.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -94,6 +95,10 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
@@ -217,6 +222,14 @@ public class Product {
 
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
+    }
+
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
     public List<ProductImage> getImages() {
