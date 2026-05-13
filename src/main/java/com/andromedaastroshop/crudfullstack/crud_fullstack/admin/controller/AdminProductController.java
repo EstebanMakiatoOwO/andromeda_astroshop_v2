@@ -64,6 +64,12 @@ public class AdminProductController {
         return ResponseEntity.ok(ApiResponse.success("Producto actualizado", adminProductService.updateProduct(id, request, image)));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+        adminProductService.deleteProduct(id);
+        return ResponseEntity.ok(ApiResponse.success("Producto eliminado", null));
+    }
+
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
         return ResponseEntity.ok(ApiResponse.success("Categorías obtenidas", categoryService.findAllCategories()));

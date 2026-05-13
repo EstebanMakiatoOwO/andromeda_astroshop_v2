@@ -158,6 +158,15 @@ public class AdminProductServiceImpl implements AdminProductService {
         return toAdminResponse(productRepository.findById(updated.getId()).orElseThrow());
     }
 
+    @Override
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
+        product.getImages().forEach(img -> storageService.delete(img.getUrl()));
+        productRepository.delete(product);
+    }
+
     // ── Specification builders ────────────────────────────────────────────────
 
     private Specification<Product> buildSpec(String q, String status, String availability, String stock) {

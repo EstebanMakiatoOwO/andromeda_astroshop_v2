@@ -11,4 +11,5 @@ public interface AdminProductService {
     AdminProductResponse getProductById(Long id);
     AdminProductResponse createProduct(CreateProductRequest request, MultipartFile image);
     AdminProductResponse updateProduct(Long id, UpdateProductRequest request, MultipartFile image);
+    void deleteProduct(Long id);
 }
