@@ -203,6 +203,10 @@ public class ProductServiceImpl implements ProductService {
                         category.getName(),
                         category.getDescription(),
                         category.getSlug(),
+                        category.getIsActive(),
+                        category.getSortOrder(),
+                        category.getImageUrl(),
+                        category.getParent() != null ? category.getParent().getId() : null,
                         category.getCreatedAt(),
                         category.getUpdatedAt()
                 ))

@@ -256,7 +256,11 @@ public class AdminProductServiceImpl implements AdminProductService {
 
     private AdminProductResponse toAdminResponse(Product product) {
         List<CategoryResponse> categories = product.getCategories().stream()
-                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getDescription(), c.getSlug(), c.getCreatedAt(), c.getUpdatedAt()))
+                .map(c -> new CategoryResponse(
+                        c.getId(), c.getName(), c.getDescription(), c.getSlug(),
+                        c.getIsActive(), c.getSortOrder(), c.getImageUrl(),
+                        c.getParent() != null ? c.getParent().getId() : null,
+                        c.getCreatedAt(), c.getUpdatedAt()))
                 .toList();
 
         List<String> images = product.getImages().stream()

@@ -7,8 +7,6 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.SalesDataPo
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.dto.*;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.admin.service.AdminDashboardService;
 import org.springframework.data.domain.Page;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.dto.CategoryResponse;
-import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.service.CategoryService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.OrderResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.dto.UpdateOrderStatusRequest;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.service.OrderService;
@@ -38,20 +36,17 @@ public class AdminDashboardController {
     private final OrderService orderService;
     private final ProductService productService;
     private final ReviewService reviewService;
-    private final CategoryService categoryService;
 
     public AdminDashboardController(AdminDashboardService dashboardService,
                                     UserService userService,
                                     OrderService orderService,
                                     ProductService productService,
-                                    ReviewService reviewService,
-                                    CategoryService categoryService) {
+                                    ReviewService reviewService) {
         this.dashboardService = dashboardService;
         this.userService = userService;
         this.orderService = orderService;
         this.productService = productService;
         this.reviewService = reviewService;
-        this.categoryService = categoryService;
     }
 
     @GetMapping("/dashboard/stats")
@@ -207,8 +202,4 @@ public class AdminDashboardController {
         );
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
-        return ResponseEntity.ok(ApiResponse.success("Categorías obtenidas", categoryService.findAllCategories()));
-    }
 }

@@ -29,32 +29,27 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceAlreadyExistsException("Category with slug '" + request.slug() + "' already exists");
         }
 
-        Category category = new Category();
-        category.setName(request.name());
-        category.setDescription(request.description());
-        category.setSlug(request.slug());
-
-        return mapToCategoryResponse(categoryRepository.save(category));
+        Category category = buildCategory(new Category(), request);
+        return toResponse(categoryRepository.save(category));
     }
 
     @Override
     public CategoryResponse findById(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
-        return mapToCategoryResponse(category);
+        return toResponse(categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id)));
     }
 
     @Override
     public CategoryResponse findBySlug(String slug) {
         return categoryRepository.findBySlug(slug)
-                .map(this::mapToCategoryResponse)
+                .map(this::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with slug: " + slug));
     }
 
     @Override
     public List<CategoryResponse> findAllCategories() {
-        return categoryRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(this::mapToCategoryResponse)
+        return categoryRepository.findAllByOrderBySortOrderAscNameAsc().stream()
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -70,27 +65,46 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceAlreadyExistsException("Category with slug '" + request.slug() + "' already exists");
         }
 
-        category.setName(request.name());
-        category.setDescription(request.description());
-        category.setSlug(request.slug());
-
-        return mapToCategoryResponse(categoryRepository.save(category));
+        return toResponse(categoryRepository.save(buildCategory(category, request)));
     }
 
     @Override
     public String deleteById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        categoryRepository.deleteProductCategoryRelations(id);
         categoryRepository.delete(category);
         return "Category deleted successfully";
     }
 
-    private CategoryResponse mapToCategoryResponse(Category category) {
+    private Category buildCategory(Category category, CreateCategoryRequest request) {
+        category.setName(request.name());
+        category.setDescription(request.description());
+        category.setSlug(request.slug());
+        category.setIsActive(request.isActive() != null ? request.isActive() : Boolean.TRUE);
+        category.setSortOrder(request.sortOrder() != null ? request.sortOrder() : 0);
+        category.setImageUrl(request.imageUrl());
+        category.setMetaTitle(request.metaTitle());
+        category.setMetaDescription(request.metaDescription());
+        if (request.parentId() != null) {
+            category.setParent(categoryRepository.findById(request.parentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoría padre no encontrada con id: " + request.parentId())));
+        } else {
+            category.setParent(null);
+        }
+        return category;
+    }
+
+    CategoryResponse toResponse(Category category) {
         return new CategoryResponse(
                 category.getId(),
                 category.getName(),
                 category.getDescription(),
                 category.getSlug(),
+                category.getIsActive(),
+                category.getSortOrder(),
+                category.getImageUrl(),
+                category.getParent() != null ? category.getParent().getId() : null,
                 category.getCreatedAt(),
                 category.getUpdatedAt()
         );
