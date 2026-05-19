@@ -8,6 +8,7 @@ public record CategoryResponse(
         String description,
         String slug,
         Boolean isActive,
+        Boolean showInMenu,
         Integer sortOrder,
         String imageUrl,
         Long parentId,

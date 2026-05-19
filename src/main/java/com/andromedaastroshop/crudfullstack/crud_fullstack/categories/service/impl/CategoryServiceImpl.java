@@ -82,6 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(request.description());
         category.setSlug(request.slug());
         category.setIsActive(request.isActive() != null ? request.isActive() : Boolean.TRUE);
+        category.setShowInMenu(request.showInMenu() != null ? request.showInMenu() : Boolean.TRUE);
         category.setSortOrder(request.sortOrder() != null ? request.sortOrder() : 0);
         category.setImageUrl(request.imageUrl());
         category.setMetaTitle(request.metaTitle());
@@ -102,6 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
                 category.getDescription(),
                 category.getSlug(),
                 category.getIsActive(),
+                category.getShowInMenu(),
                 category.getSortOrder(),
                 category.getImageUrl(),
                 category.getParent() != null ? category.getParent().getId() : null,

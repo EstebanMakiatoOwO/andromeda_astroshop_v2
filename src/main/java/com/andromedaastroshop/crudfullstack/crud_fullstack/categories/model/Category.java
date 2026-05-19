@@ -36,6 +36,9 @@ public class Category {
     private Boolean isActive = true;
 
     @Column(nullable = false)
+    private Boolean showInMenu = true;
+
+    @Column(nullable = false)
     private Integer sortOrder = 0;
 
     @Size(max = 255)
@@ -72,6 +75,9 @@ public class Category {
 
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+
+    public Boolean getShowInMenu() { return showInMenu; }
+    public void setShowInMenu(Boolean showInMenu) { this.showInMenu = showInMenu; }
 
     public Integer getSortOrder() { return sortOrder; }
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }

@@ -12,6 +12,8 @@ public record CreateCategoryRequest(
 
         Boolean isActive,
 
+        Boolean showInMenu,
+
         Integer sortOrder,
 
         @Size(max = 255) String imageUrl,
