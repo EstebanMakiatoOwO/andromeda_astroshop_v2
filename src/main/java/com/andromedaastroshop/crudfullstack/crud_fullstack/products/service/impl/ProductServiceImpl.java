@@ -204,6 +204,7 @@ public class ProductServiceImpl implements ProductService {
                         category.getDescription(),
                         category.getSlug(),
                         category.getIsActive(),
+                        category.getShowInMenu(),
                         category.getSortOrder(),
                         category.getImageUrl(),
                         category.getParent() != null ? category.getParent().getId() : null,

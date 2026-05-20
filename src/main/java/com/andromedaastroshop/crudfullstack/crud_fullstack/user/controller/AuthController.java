@@ -7,10 +7,7 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.user.dto.UserRespose;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -38,5 +35,11 @@ public class AuthController {
     @PostMapping("/admin/login")
     public ResponseEntity<JwtRespose> adminLogin(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.adminLogin(request));
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<Void> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
+        return ResponseEntity.noContent().build();
     }
 }

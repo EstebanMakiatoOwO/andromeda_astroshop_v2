@@ -12,4 +12,6 @@ public interface AuthService {
     JwtRespose login(LoginRequest request);
 
     JwtRespose adminLogin(LoginRequest request);
+
+    void verifyEmail(String token);
 }

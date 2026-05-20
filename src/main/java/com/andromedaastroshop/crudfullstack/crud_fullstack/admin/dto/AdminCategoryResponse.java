@@ -9,6 +9,7 @@ public record AdminCategoryResponse(
         String description,
         String slug,
         Boolean isActive,
+        Boolean showInMenu,
         Integer sortOrder,
         String imageUrl,
         String metaTitle,

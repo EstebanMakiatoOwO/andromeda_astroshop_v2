@@ -267,7 +267,7 @@ public class AdminProductServiceImpl implements AdminProductService {
         List<CategoryResponse> categories = product.getCategories().stream()
                 .map(c -> new CategoryResponse(
                         c.getId(), c.getName(), c.getDescription(), c.getSlug(),
-                        c.getIsActive(), c.getSortOrder(), c.getImageUrl(),
+                        c.getIsActive(), c.getShowInMenu(), c.getSortOrder(), c.getImageUrl(),
                         c.getParent() != null ? c.getParent().getId() : null,
                         c.getCreatedAt(), c.getUpdatedAt()))
                 .toList();

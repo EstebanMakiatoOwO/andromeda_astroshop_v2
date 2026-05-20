@@ -105,6 +105,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
         category.setDescription(request.description());
         category.setSlug(request.slug());
         category.setIsActive(request.isActive() != null ? request.isActive() : Boolean.TRUE);
+        category.setShowInMenu(request.showInMenu() != null ? request.showInMenu() : Boolean.TRUE);
         category.setSortOrder(request.sortOrder() != null ? request.sortOrder() : 0);
         category.setImageUrl(request.imageUrl());
         category.setMetaTitle(request.metaTitle());
@@ -126,6 +127,7 @@ public class AdminCategoryServiceImpl implements AdminCategoryService {
                 c.getDescription(),
                 c.getSlug(),
                 c.getIsActive(),
+                c.getShowInMenu(),
                 c.getSortOrder(),
                 c.getImageUrl(),
                 c.getMetaTitle(),

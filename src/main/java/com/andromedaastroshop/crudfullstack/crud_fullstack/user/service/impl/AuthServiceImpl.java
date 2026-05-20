@@ -12,10 +12,13 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.user.model.User;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.repository.UserRepository;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.security.JwtService;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.AuthService;
+import com.andromedaastroshop.crudfullstack.crud_fullstack.user.service.EmailService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -24,13 +27,16 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
     public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           AuthenticationManager authenticationManager, JwtService jwtService) {
+                           AuthenticationManager authenticationManager, JwtService jwtService,
+                           EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -44,8 +50,11 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(Role.USER);
+        user.setEmailVerified(false);
+        user.setVerificationToken(UUID.randomUUID().toString());
 
         User savedUser = userRepository.save(user);
+        emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getName(), savedUser.getVerificationToken());
 
         return mapToUserRespose(savedUser);
     }
@@ -74,6 +83,16 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return new JwtRespose(user.getName(), jwtService.generateToken(user.getEmail()));
+    }
+
+    @Override
+    public void verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Token de verificación inválido o ya utilizado"));
+
+        user.setEmailVerified(true);
+        user.setVerificationToken(null);
+        userRepository.save(user);
     }
 
     private UserRespose mapToUserRespose(User user) {
