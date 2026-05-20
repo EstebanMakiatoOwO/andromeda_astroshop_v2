@@ -52,6 +52,10 @@ public class OrderServiceImpl implements OrderService {
             order.setUser(userRepository.findById(userId)
                     .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado")));
         } else {
+            if (request.guestName() == null || request.guestName().isBlank())
+                throw new IllegalArgumentException("El nombre es obligatorio para invitados");
+            if (request.guestEmail() == null || request.guestEmail().isBlank())
+                throw new IllegalArgumentException("El email es obligatorio para invitados");
             order.setGuestEmail(request.guestEmail());
             order.setGuestName(request.guestName());
         }
@@ -106,6 +110,11 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingCost(request.shippingCost());
         order.setTotal(subtotal.add(request.shippingCost()));
         order.setNotes(request.notes());
+        order.setShippingStreet(request.shippingStreet());
+        order.setShippingCity(request.shippingCity());
+        order.setShippingState(request.shippingState());
+        order.setShippingZipCode(request.shippingZipCode());
+        order.setShippingCountry(request.shippingCountry());
 
         Order savedOrder = orderRepository.save(order);
         PreferenceData preference = mercadoPagoClient.createPreference(savedOrder);
@@ -179,6 +188,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    public OrderResponse adminCancel(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada: " + id));
+
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.REFUNDED) {
+            throw new OrderNotModifiableException("La orden ya está en estado " + order.getStatus() + " y no puede modificarse");
+        }
+
+        order.getItems().forEach(item -> {
+            if (!Boolean.TRUE.equals(item.getIsCatalog())) {
+                productRepository.incrementStock(item.getProduct().getId(), item.getQuantity());
+            }
+        });
+
+        order.setStatus(OrderStatus.CANCELLED);
+        return mapToOrderResponse(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
     public void handlePaymentConfirmed(String mpPreferenceId) {
         Order order = orderRepository.findByMpPreferenceId(mpPreferenceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada para preferenceId: " + mpPreferenceId));
@@ -189,6 +218,14 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderResponse> search(String q) {
+        return orderRepository.searchByQuery(q)
+                .stream()
+                .map(this::mapToOrderResponse)
+                .toList();
     }
 
     private OrderResponse mapToOrderResponse(Order order) {
@@ -216,6 +253,11 @@ public class OrderServiceImpl implements OrderService {
                 order.getMpPreferenceId(),
                 order.getCheckoutUrl(),
                 order.getNotes(),
+                order.getShippingStreet(),
+                order.getShippingCity(),
+                order.getShippingState(),
+                order.getShippingZipCode(),
+                order.getShippingCountry(),
                 items,
                 order.getCreatedAt(),
                 order.getUpdatedAt()

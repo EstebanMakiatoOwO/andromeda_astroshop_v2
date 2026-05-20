@@ -81,6 +81,15 @@ public class UserServiceImpl implements UserService {
         return "User deleted successfully";
     }
 
+    @Override
+    public List<UserRespose> search(String q) {
+        return userRepository
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(q, q)
+                .stream()
+                .map(this::mapToUserRespose)
+                .toList();
+    }
+
     private UserRespose mapToUserRespose(User user) {
         return new UserRespose(
                 user.getId(),

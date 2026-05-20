@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/stock-movements")
+@RequestMapping("/api/v1/admin/stock-movements")
+@PreAuthorize("hasRole('ADMIN')")
 public class StockMovementController {
 
     private final StockMovementService stockMovementService;
@@ -24,14 +25,13 @@ public class StockMovementController {
         this.stockMovementService = stockMovementService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<StockMovementResponse>> create(
             @Valid @RequestBody CreateStockMovementRequest request,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        StockMovementResponse response = stockMovementService.create(request, userDetails.getUsername());
-        return ResponseEntity.ok(ApiResponse.success("Movimiento de stock registrado", response));
+        return ResponseEntity.ok(ApiResponse.success("Movimiento de stock registrado",
+                stockMovementService.create(request, userDetails.getUsername())));
     }
 
     @GetMapping

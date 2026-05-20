@@ -24,4 +24,6 @@ public interface ProductService {
     String deleteById(Long id);
 
     List<ProductResponse> findByCategory(Long categoryId);
+
+    ProductResponse updateCategories(Long id, List<Long> categoryIds);
 }

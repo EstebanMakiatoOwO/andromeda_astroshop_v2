@@ -4,6 +4,7 @@ import com.andromedaastroshop.crudfullstack.crud_fullstack.orders.model.Order;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
+import com.mercadopago.client.preference.PreferencePaymentMethodsRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
@@ -25,15 +26,22 @@ public class MercadoPagoClient {
                 .map(item -> PreferenceItemRequest.builder()
                         .id(String.valueOf(item.getProduct().getId()))
                         .title(item.getProduct().getName())
+                        .description(item.getProduct().getShortDescription())
                         .quantity(item.getQuantity())
                         .unitPrice(item.getUnitPrice())
+                        .currencyId("MXN")
                         .build())
                 .toList();
+
+        PreferencePaymentMethodsRequest paymentMethods = PreferencePaymentMethodsRequest.builder()
+                .installments(1)
+                .build();
 
         PreferenceRequest request = PreferenceRequest.builder()
                 .items(items)
                 .externalReference(String.valueOf(order.getId()))
                 .notificationUrl(webhookUrl)
+                .paymentMethods(paymentMethods)
                 .build();
 
         try {

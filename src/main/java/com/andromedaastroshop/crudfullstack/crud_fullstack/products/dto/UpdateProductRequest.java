@@ -39,5 +39,7 @@ public record UpdateProductRequest(
 
     Boolean isCatalog,
 
+    Long brandId,
+
     List<Long> categoryIds
 ) {}

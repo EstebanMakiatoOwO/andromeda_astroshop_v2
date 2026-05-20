@@ -2,6 +2,7 @@ package com.andromedaastroshop.crudfullstack.crud_fullstack.products.repository;
 
 import com.andromedaastroshop.crudfullstack.crud_fullstack.products.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
     @Modifying
     @Query("UPDATE Product p SET p.stock = p.stock - :quantity WHERE p.id = :id AND p.stock >= :quantity")
@@ -32,4 +33,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByBarcode(String barcode);
 
     List<Product> findByCategoriesId(Long categoryId);
+
+    @Query("SELECT p FROM Product p WHERE p.isActive = true AND (p.stock = 0 OR (p.stockAlertThreshold IS NOT NULL AND p.stock <= p.stockAlertThreshold)) ORDER BY p.stock ASC")
+    List<Product> findLowStockProducts();
 }

@@ -1,5 +1,6 @@
 package com.andromedaastroshop.crudfullstack.crud_fullstack.products.dto;
 
+import com.andromedaastroshop.crudfullstack.crud_fullstack.brands.dto.BrandResponse;
 import com.andromedaastroshop.crudfullstack.crud_fullstack.categories.dto.CategoryResponse;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public record ProductResponse(
         Boolean isActive,
         Boolean isCatalog,
         List<String> images,
-        List<CategoryResponse> categories
+        List<CategoryResponse> categories,
+        BrandResponse brand
 ) {
 }

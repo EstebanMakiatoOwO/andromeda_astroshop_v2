@@ -39,5 +39,7 @@ public record CreateProductRequest(
 
     Boolean isCatalog,
 
+    Long brandId,
+
     List<Long> categoryIds
 ) {}
