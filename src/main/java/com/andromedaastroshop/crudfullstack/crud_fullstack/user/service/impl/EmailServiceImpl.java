@@ -14,10 +14,10 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.base-url}")
-    private String baseUrl;
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
-    @Value("${spring.mail.username}")
+    @Value("${app.mail.from}")
     private String fromEmail;
 
     public EmailServiceImpl(JavaMailSender mailSender) {
@@ -35,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(toEmail);
             helper.setSubject("Confirma tu cuenta en Andromeda Astro Shop");
 
-            String verifyUrl = baseUrl + "/api/v1/auth/verify?token=" + token;
+            String verifyUrl = frontendUrl + "/verify-email?token=" + token;
             String html = buildEmailHtml(userName, verifyUrl);
 
             helper.setText(html, true);
